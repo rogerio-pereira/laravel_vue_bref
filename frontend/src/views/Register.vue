@@ -41,7 +41,7 @@
                 <v-btn @click="register" color='primary' class='mx-auto' variant='elevated'>
                     Button 
                 </v-btn>
-            </v-row>{{text}}
+            </v-row>
 
             
         </v-card-actions>
@@ -58,8 +58,6 @@
         'password': '',
         'password_confirmation': '',
     })
-
-    const text = computed(() => import.meta.env.VITE_BACKEND_URL)
 
     function register() {
         axios.post('/register', form.value)
