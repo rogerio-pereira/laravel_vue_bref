@@ -10,6 +10,7 @@ import VueAxios from 'vue-axios'
 import vuetify from '@/plugins/vuetify'
 
 //Axios Config
+axios.defaults.withXSRFToken = true
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
 axios.defaults.headers.common['Access-Control-Origin'] = '*';
