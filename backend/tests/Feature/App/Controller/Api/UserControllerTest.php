@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\App\Controller\Api;
 
+use App\Jobs\ResizeImage;
+use App\Jobs\ResizeImageJob;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -106,12 +109,16 @@ class UserControllerTest extends TestCase
     public function test_can_update_can_upload_image()
     {
         Storage::fake();
+        Queue::fake([
+            ResizeImageJob::class,
+        ]);
         
         $user = User::factory()->create();
         $id = $user->id;
         $fileName = "profiles/{$id}.jpg";
 
         Storage::assertMissing($fileName);
+        Queue::assertNothingPushed();
 
         $this->assertDatabaseMissing('users', [
             'id' => $user->id,
@@ -125,10 +132,13 @@ class UserControllerTest extends TestCase
             'file' => $uploadFile,
         ]);
 
-        Storage::assertExists($fileName);
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'picture' => $fileName
         ]);
+        Storage::assertExists($fileName);
+        Queue::assertPushed(function (ResizeImageJob $job) use ($fileName) {
+            return $job->image === $fileName;
+        });
     }
 }
