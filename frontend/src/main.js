@@ -7,25 +7,15 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-// Vuetify
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+import vuetify from '@/plugins/vuetify'
 
 //Axios Config
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = import.meta.VITE_BACKEND_URL
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
 axios.defaults.headers.common['Access-Control-Origin'] = '*';
 axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 // axios.defaults.headers.common['X-Authorization'] = '';
-
-// Vuetify
-const vuetify = createVuetify({
-                        components,
-                        directives,
-                    })
 
 const app = createApp(App)
 
