@@ -46,4 +46,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function deleteTokens() : void 
+    {
+        $this->tokens()->delete();
+    }
+
+    public function newToken(string $name = 'frontend') : string 
+    {
+        return $this->createToken($name)->plainTextToken;
+    }
+
+    public function regenerateToken(string $name = 'frontend')
+    {
+        $this->deleteTokens();
+        return $this->newToken($name);
+    }
 }
