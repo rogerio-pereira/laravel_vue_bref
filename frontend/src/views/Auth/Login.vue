@@ -18,6 +18,7 @@
                 label="Password"
                 v-model='form.password'
                 prepend-icon="mdi-asterisk"
+                type='password'
                 clearable
             />
         </v-card-text>
@@ -28,8 +29,6 @@
                     Button 
                 </v-btn>
             </v-row>
-
-            
         </v-card-actions>
     </v-card>
 </template>

@@ -25,6 +25,7 @@
                 label="Password"
                 v-model='form.password'
                 prepend-icon="mdi-asterisk"
+                type='password'
                 clearable
             />
 
@@ -32,6 +33,7 @@
                 label="Confirmation"
                 v-model='form.password_confirmation'
                 prepend-icon="mdi-asterisk"
+                type='password'
                 clearable
             />
         </v-card-text>
