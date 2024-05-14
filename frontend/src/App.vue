@@ -9,9 +9,13 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
 
+        <!-- Guest Items -->
         <RouterLink to="/register" v-if='userStore.isGuest'>Register</RouterLink>
         <RouterLink to="/login" v-if='userStore.isGuest'>Login</RouterLink>
-        <RouterLink to="/logout" @click.prevent='logout' v-if='!userStore.isGuest'>Logout</RouterLink>
+
+        <!-- Autenticated items -->
+        <RouterLink to="/profile" v-if='!userStore.isGuest'>Profile</RouterLink>
+        <RouterLink to="#" @click.prevent='logout' v-if='!userStore.isGuest'>Logout</RouterLink>
       </nav>
     </div>
   </header>
