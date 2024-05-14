@@ -7,8 +7,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Spatie\Image\Enums\Fit;
-use Spatie\Image\Image;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
 
 class ResizeImageJob implements ShouldQueue
 {
@@ -18,7 +19,7 @@ class ResizeImageJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public string $image
+        public string $imagePath
     ) {}
 
     /**
@@ -26,8 +27,12 @@ class ResizeImageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Image::load($this->image)
-            ->fit(Fit::Max, 250, 250)
-            ->save();
+        $image = Storage::get($this->imagePath);
+        
+        $scaled = ImageManager::gd()
+                        ->read($image)
+                        ->scaleDown(250,250)
+                        ->encode();
+        Storage::put($this->imagePath, $scaled);
     }
 }
