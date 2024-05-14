@@ -7,12 +7,12 @@
     "require": {
         "php": "^8.2",
         "aws/aws-sdk-php": "^3.306",
+        "intervention/image": "^3.6",
         "laravel/framework": "^11.0",
         "laravel/horizon": "^5.24",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "league/flysystem-aws-s3-v3": "^3.0",
-        "spatie/image": "^3.6"
+        "league/flysystem-aws-s3-v3": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
