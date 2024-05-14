@@ -26,7 +26,7 @@
         <v-card-actions class='mb-4'>
             <v-row class='text-center'>
                 <v-btn @click="login" color='primary' class='mx-auto' variant='elevated'>
-                    Button 
+                    Login 
                 </v-btn>
             </v-row>
         </v-card-actions>

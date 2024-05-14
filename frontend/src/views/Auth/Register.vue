@@ -41,7 +41,7 @@
         <v-card-actions class='mb-4'>
             <v-row class='text-center'>
                 <v-btn @click="register" color='primary' class='mx-auto' variant='elevated'>
-                    Button 
+                    Register
                 </v-btn>
             </v-row>
 
