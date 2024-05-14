@@ -82,9 +82,10 @@
 
     function update() 
     {
-        axios.put(
+        axios.post(
                 '/api/user/update', 
                 {
+                    _method: 'put',
                     name: user.value.name,
                     email: user.value.email,
                     file: user.value.file,
