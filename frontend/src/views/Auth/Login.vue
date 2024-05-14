@@ -42,8 +42,8 @@
     const userStore = useUserStore()
 
     const form = ref({
-        'email': '',
-        'password': '',
+        'email': 'test@email.com',
+        'password': 'test',
     })
 
     function login() {
