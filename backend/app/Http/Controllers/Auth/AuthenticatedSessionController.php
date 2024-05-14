@@ -22,9 +22,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
         
-        $user->tokens()->delete();
-        $token = $user->createToken('frontend')->plainTextToken;
-
+        $token = $user->regenerateToken();
         $user = $user->toArray();
         $user['token'] = $token;
 
