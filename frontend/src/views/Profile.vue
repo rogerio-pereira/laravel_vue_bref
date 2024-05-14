@@ -8,10 +8,15 @@
 
         <v-card-text>
             <v-row>
-                <v-avatar color='blue-grey-lighten-5' :image="userpicture" size="80" class='mx-auto mt-4 mb-8'>
-                    <span class="text-h5">
+                <v-avatar color='blue-grey-lighten-5' size="80" class='mx-auto mt-4 mb-8'>
+                    <span class="text-h5" v-if='!user.picture'>
                         {{ initials }}
                     </span>
+                    <v-img
+                        :src="user.picture"
+                        v-else
+                    />
+                
                 </v-avatar>
             </v-row>
 
