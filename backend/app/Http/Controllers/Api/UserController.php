@@ -28,8 +28,8 @@ class UserController extends Controller
 
             $file = Storage::putFileAs('profiles', $file, $fileName);
             $data['picture'] = $file;
-            ResizeImageJob::dispatch($file)
-                ->onQueue('files');
+
+            ResizeImageJob::dispatch($file);
         }
 
         $user = Auth::user();
