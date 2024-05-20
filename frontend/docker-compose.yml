@@ -2,8 +2,15 @@ version: "3.4"
 
 services:
     frontend:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}'
+                AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}'
+        image: sail-8.3/app
         container_name: bref_frontend
-        image: node:lts
+        image: bref-frontend
         working_dir: /var/www/html/app/
         # entrypoint: /bin/bash
         # tty: true
