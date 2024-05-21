@@ -8,9 +8,8 @@ services:
             args:
                 AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}'
                 AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}'
-        image: sail-8.3/app
         container_name: bref_frontend
-        image: bref-frontend
+        image: bref_frontend
         working_dir: /var/www/html/app/
         # entrypoint: /bin/bash
         # tty: true
