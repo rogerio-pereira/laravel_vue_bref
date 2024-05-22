@@ -5,6 +5,8 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
+                AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}'
+                AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}'
         image: sail-8.3/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
