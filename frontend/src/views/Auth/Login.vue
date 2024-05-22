@@ -47,13 +47,18 @@
     })
 
     function login() {
-        axios.post('/login', form.value)
-            .then(response => {
-                userStore.user = response.data.user
-                router.push({name: 'home'})
-            })
-            .catch(error => {
-                console.log(error.response.data)
+        //Get CSRF TOKEN
+        axios.get('sanctum/csrf-cookie')
+            .then(() => {
+                //Login
+                axios.post('/login', form.value)
+                    .then(response => {
+                        userStore.user = response.data.user
+                        router.push({name: 'home'})
+                    })
+                    .catch(error => {
+                        console.log(error.response.data)
+                    })
             })
     }
 </script>
