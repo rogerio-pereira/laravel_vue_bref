@@ -26,10 +26,10 @@ class UserController extends Controller
             $ext = $file->extension();
             $fileName = "{$userId}.{$ext}";
 
-            $file = Storage::putFileAs('profiles', $file, $fileName);
-            $data['picture'] = $file;
+            $path = Storage::putFileAs('profiles', $file, $fileName);
+            $data['picture'] = $path;
 
-            ResizeImageJob::dispatch($file);
+            ResizeImageJob::dispatch($path);
         }
 
         $user = Auth::user();
