@@ -49,15 +49,60 @@ resources:
                                     ]
                                 ]
         
+        Certificate:
+            Type: "AWS::CertificateManager::Certificate"
+            Properties:
+                DomainName: ${env:AWS_DOMAIN}
+                ValidationMethod: DNS
+
+        StaticWebsiteCDN:
+            Type: AWS::CloudFront::Distribution
+            Properties:
+                DistributionConfig:
+                    Origins:
+                        -   DomainName:
+                                Fn::GetAtt: [S3StaticWebsite, DomainName]
+                            Id: S3Origin
+                            S3OriginConfig: {}
+                    Enabled: true
+                    DefaultRootObject: index.html
+                    ViewerCertificate:
+                        AcmCertificateArn:
+                            Ref: Certificate
+                        SslSupportMethod: sni-only
+                        MinimumProtocolVersion: TLSv1.2_2021  # Ensures support for modern TLS
+                    DefaultCacheBehavior:
+                        AllowedMethods:
+                            - GET
+                            - HEAD
+                        TargetOriginId: S3Origin
+                        ViewerProtocolPolicy: redirect-to-https
+                        CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # Use AWS managed cachingOptimized policy
+                        OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # Use AWS managed cachingOptimized policy
+                        Compress: true  # Enable automatic compression
+                        ForwardedValues:
+                            QueryString: false
+                            Cookies:
+                                Forward: none
+                    PriceClass: PriceClass_All  # Use all edge locations (best performance)
+                    HttpVersion: http2  # Supported HTTP versions: HTTP/2
+                    IPV6Enabled: true  # IPv6
+                    Restrictions:
+                        GeoRestriction:
+                            RestrictionType: none
+                    Aliases:
+                        - ${env:AWS_DOMAIN}  # Add your CNAME here
+
         DnsRecord:
             Type: "AWS::Route53::RecordSet"
             Properties:
-                AliasTarget:
-                    DNSName: ${self:custom.aliasDNSName}
-                    HostedZoneId: ${self:custom.aliasHostedZoneId}
-                HostedZoneName: ${self:custom.hostedZoneName}.
-                Name: ${self:custom.siteName}
+                HostedZoneName: ${env:AWS_HOST}.  # Need . in the end
+                Name: ${env:AWS_DOMAIN}
                 Type: 'A'
+                AliasTarget:
+                    DNSName: 
+                        Fn::GetAtt: [StaticWebsiteCDN, DomainName]
+                    HostedZoneId: "Z2FDTNDATAQYW2"  # CloudFront hosted zone ID
 
     Outputs:
         S3StaticWebsiteOutputName:
@@ -67,11 +112,6 @@ resources:
                 Fn::GetAtt: ["S3StaticWebsite", "WebsiteURL"]
 
 custom:
-    siteName: ${env:AWS_DOMAIN}         #a record should include top level domain
-    hostedZoneName: ${env:AWS_HOST}     #top level domain, where the A record will be added
-    aliasHostedZoneId: Z3AQBSTGFYJSTF   # us-east-1
-    # aliasDNSName: d1gxuk427b4kll.cloudfront.net
-    aliasDNSName: s3-website-us-east-1.amazonaws.com
     s3Sync:
         -   bucketName: ${env:AWS_DOMAIN}
             localDir: dist
