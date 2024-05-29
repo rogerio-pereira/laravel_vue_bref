@@ -63,6 +63,17 @@ return [
             'after_commit' => false,
         ],
 
+        'custom_sqs' => [
+            'driver' => 'sqs',
+            'key' => env('CUSTOM_AWS_ACCESS_KEY_ID'),
+            'secret' => env('CUSTOM_AWS_SECRET_ACCESS_KEY'),
+            'prefix' => env('CUSTOM_SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+            'queue' => env('CUSTOM_SQS_QUEUE', 'default'),
+            'suffix' => env('CUSTOM_SQS_SUFFIX'),
+            'region' => env('CUSTOM_AWS_DEFAULT_REGION', 'us-east-1'),
+            'after_commit' => false,
+        ],
+
         'redis' => [
             'driver' => 'redis',
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
