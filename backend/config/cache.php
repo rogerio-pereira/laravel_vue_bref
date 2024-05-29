@@ -83,7 +83,6 @@ return [
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
             'table' => env('DYNAMODB_CACHE_TABLE', 'cache'),
             'endpoint' => env('DYNAMODB_ENDPOINT'),
-            'token' => env('AWS_SESSION_TOKEN'),
             'attributes' => [
                 'key' => 'id',
                 'expiration' => 'ttl',
