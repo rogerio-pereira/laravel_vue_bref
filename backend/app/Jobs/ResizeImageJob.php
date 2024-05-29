@@ -27,12 +27,21 @@ class ResizeImageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $image = Storage::get($this->imagePath);
-        
-        $scaled = ImageManager::gd()
-                        ->read($image)
-                        ->scaleDown(250,250)
-                        ->encode();
-        Storage::put($this->imagePath, $scaled);
+        try{
+            $image = Storage::get($this->imagePath);
+            
+            $scaled = ImageManager::gd()
+                            ->read($image)
+                            ->scaleDown(250,250)
+                            ->encode();
+
+            Storage::put($this->imagePath, $scaled);
+
+            Log::info("Image {$this->imagePath} resized.");
+        }
+        catch(\Exception $e)
+        {
+            Log::error('Failed to resize image. '.$e->getMessage());
+        }
     }
 }
