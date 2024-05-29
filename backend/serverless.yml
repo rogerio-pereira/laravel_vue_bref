@@ -34,10 +34,10 @@ resources:
         #                         - s3-object-lambda:*
         #                     Resource: !Sub '${S3.Arn}/*'
 
-        SQS:
-            Type: AWS::SQS::Queue
-            Properties:
-                QueueName: ${env:SQS_QUEUE}
+        # SQS:
+        #     Type: AWS::SQS::Queue
+        #     Properties:
+        #         QueueName: ${env:SQS_QUEUE}
 
         # Create SSL certificate
         Certificate:
@@ -95,7 +95,7 @@ provider:
                 -   Effect: Allow
                     Action: sqs:*
                     Resource:
-                        - !GetAtt SQS.Arn # the SQS queue
+                        - ${construct:queue.queueArn} # the SQS queue
     # Environment variables
     environment:
         APP_ENV: local # Or use ${sls:stage} if you want the environment to match the stage
@@ -175,3 +175,36 @@ functions:
         layers:
             - ${bref-extra:pgsql-php-82}
             - ${bref-extra:gd-php-82}
+
+constructs:
+    queue:
+        type: queue
+        extensions:
+            queue:
+                Properties:
+                    QueueName: ${env:SQS_QUEUE}
+            dlq:
+                Properties:
+                    QueueName: ${env:SQS_QUEUE}_dlq
+        worker:
+            handler: Bref\LaravelBridge\Queue\QueueHandler
+            timeout: 60 # seconds
+            # runtime: php-82 # Doesn't work, needs to be in layers
+            environment:
+                # FILESYSTEM_DISK: s3
+                # AWS_BUCKET: ${env:AWS_BUCKET}
+                # QUEUE_CONNECTION: sqs
+                # SQS_PREFIX: ${env:SQS_PREFIX} 
+                # SQS_QUEUE: ${env:SQS_QUEUE}
+                FILESYSTEM_DISK: custom_s3
+                CUSTOM_AWS_ACCESS_KEY_ID: ${env:CUSTOM_AWS_ACCESS_KEY_ID}
+                CUSTOM_AWS_SECRET_ACCESS_KEY: ${env:CUSTOM_AWS_SECRET_ACCESS_KEY}
+                CUSTOM_AWS_DEFAULT_REGION: ${env:CUSTOM_AWS_DEFAULT_REGION}
+                CUSTOM_AWS_BUCKET: ${env:CUSTOM_AWS_BUCKET}
+                CUSTOM_QUEUE_CONNECTION: custom_sqs
+                CUSTOM_SQS_PREFIX: ${env:CUSTOM_SQS_PREFIX} 
+                CUSTOM_SQS_QUEUE: ${env:CUSTOM_SQS_QUEUE}
+            layers:
+                - ${bref:layer.php-82}  #Using php in runtime config doesn't work, need to be here
+                - ${bref-extra:pgsql-php-82}
+                - ${bref-extra:gd-php-82}
