@@ -14,26 +14,25 @@ resources:
             Type: AWS::S3::Bucket
             Properties:
                 BucketName: ${env:AWS_BUCKET}
-                PublicAccessBlockConfiguration:
-                    BlockPublicAcls: false
-                OwnershipControls:
-                    Rules:
-                        - ObjectOwnership: ObjectWriter
+                # PublicAccessBlockConfiguration:
+                #     BlockPublicAcls: false
+                # OwnershipControls:
+                #     Rules:
+                #         - ObjectOwnership: ObjectWriter
 
-        S3BucketPolicy:
-            Type: AWS::S3::BucketPolicy
-            Properties:
-                Bucket: 
-                    Ref: S3
-                PolicyDocument:
-                    Statement:
-                        -   Effect: Allow
-                            Principal: "*"
-                            Action:
-                                - "s3:PutObject"
-                                - "s3:GetObject"
-                                - "s3:DeleteObject"
-                            Resource: !Sub '${S3.Arn}/*'
+        # S3BucketPolicy:
+        #     Type: AWS::S3::BucketPolicy
+        #     Properties:
+        #         Bucket: 
+        #             Ref: S3
+        #         PolicyDocument:
+        #             Statement:
+        #                 -   Effect: Allow
+        #                     Principal: "*"
+        #                     Action:
+        #                         - s3:*
+        #                         - s3-object-lambda:*
+        #                     Resource: !Sub '${S3.Arn}/*'
 
         SQS:
             Type: AWS::SQS::Queue
@@ -82,25 +81,37 @@ provider:
     name: aws
     # The AWS region in which to deploy (us-east-1 is the default)
     region: us-east-1
+    runtime: provided.al2
     iam:
         role:
             statements:
                 -   Effect: Allow
-                    Action:
-                        - s3:PutObject
-                        - s3:GetObject
-                        - s3:DeleteObject
+                    Action: 
+                        - s3:*
+                        - s3-object-lambda:*
                     Resource:
                         - !Sub '${S3.Arn}' # the storage bucket
                         - !Sub '${S3.Arn}/*' # and everything inside
+                -   Effect: Allow
+                    Action: sqs:*
+                    Resource:
+                        - !GetAtt SQS.Arn # the SQS queue
     # Environment variables
     environment:
         APP_ENV: local # Or use ${sls:stage} if you want the environment to match the stage
-        FILESYSTEM_DISK: s3
-        AWS_BUCKET: ${env:AWS_BUCKET}
+        # FILESYSTEM_DISK: s3
+        # AWS_BUCKET: ${env:AWS_BUCKET}
         # QUEUE_CONNECTION: sqs
         # SQS_PREFIX: ${env:SQS_PREFIX} 
         # SQS_QUEUE: ${env:SQS_QUEUE}
+        FILESYSTEM_DISK: custom_s3
+        CUSTOM_AWS_ACCESS_KEY_ID: ${env:CUSTOM_AWS_ACCESS_KEY_ID}
+        CUSTOM_AWS_SECRET_ACCESS_KEY: ${env:CUSTOM_AWS_SECRET_ACCESS_KEY}
+        CUSTOM_AWS_DEFAULT_REGION: ${env:CUSTOM_AWS_DEFAULT_REGION}
+        CUSTOM_AWS_BUCKET: ${env:CUSTOM_AWS_BUCKET}
+        CUSTOM_QUEUE_CONNECTION: custom_sqs
+        CUSTOM_SQS_PREFIX: ${env:CUSTOM_SQS_PREFIX} 
+        CUSTOM_SQS_QUEUE: ${env:CUSTOM_SQS_QUEUE}
 
 package:
     # Files and directories to exclude from deployment
@@ -119,6 +130,19 @@ functions:
         timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
         environment:
             BREF_LOOP_MAX: 250
+            # FILESYSTEM_DISK: s3
+            # AWS_BUCKET: ${env:AWS_BUCKET}
+            # QUEUE_CONNECTION: sqs
+            # SQS_PREFIX: ${env:SQS_PREFIX} 
+            # SQS_QUEUE: ${env:SQS_QUEUE}
+            FILESYSTEM_DISK: custom_s3
+            CUSTOM_AWS_ACCESS_KEY_ID: ${env:CUSTOM_AWS_ACCESS_KEY_ID}
+            CUSTOM_AWS_SECRET_ACCESS_KEY: ${env:CUSTOM_AWS_SECRET_ACCESS_KEY}
+            CUSTOM_AWS_DEFAULT_REGION: ${env:CUSTOM_AWS_DEFAULT_REGION}
+            CUSTOM_AWS_BUCKET: ${env:CUSTOM_AWS_BUCKET}
+            CUSTOM_QUEUE_CONNECTION: custom_sqs
+            CUSTOM_SQS_PREFIX: ${env:CUSTOM_SQS_PREFIX} 
+            CUSTOM_SQS_QUEUE: ${env:CUSTOM_SQS_QUEUE}
         events:
             - httpApi: '*'
         layers:
@@ -129,6 +153,20 @@ functions:
         handler: artisan
         runtime: php-82-console
         timeout: 720 # in seconds
+        environment:
+            # FILESYSTEM_DISK: s3
+            # AWS_BUCKET: ${env:AWS_BUCKET}
+            # QUEUE_CONNECTION: sqs
+            # SQS_PREFIX: ${env:SQS_PREFIX} 
+            # SQS_QUEUE: ${env:SQS_QUEUE}
+            FILESYSTEM_DISK: custom_s3
+            CUSTOM_AWS_ACCESS_KEY_ID: ${env:CUSTOM_AWS_ACCESS_KEY_ID}
+            CUSTOM_AWS_SECRET_ACCESS_KEY: ${env:CUSTOM_AWS_SECRET_ACCESS_KEY}
+            CUSTOM_AWS_DEFAULT_REGION: ${env:CUSTOM_AWS_DEFAULT_REGION}
+            CUSTOM_AWS_BUCKET: ${env:CUSTOM_AWS_BUCKET}
+            CUSTOM_QUEUE_CONNECTION: custom_sqs
+            CUSTOM_SQS_PREFIX: ${env:CUSTOM_SQS_PREFIX} 
+            CUSTOM_SQS_QUEUE: ${env:CUSTOM_SQS_QUEUE}
         # Uncomment to also run the scheduler every minute
         # events:
         #     - schedule:
@@ -136,13 +174,4 @@ functions:
         #         input: '"schedule:run"'
         layers:
             - ${bref-extra:pgsql-php-82}
-
-constructs:
-    brefqueue:
-        type: queue
-        worker:
-            handler: Bref\LaravelBridge\Queue\QueueHandler
-            runtime: php-82
-            timeout: 60 # seconds
-        layers:
-            - ${bref-extra:pgsql-php-82}
+            - ${bref-extra:gd-php-82}
